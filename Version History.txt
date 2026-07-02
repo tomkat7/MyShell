@@ -1,0 +1,23 @@
+Day 1 - 14/06/26
+- Calling child processes, replacing with programs (Basic command running functionality)
+- Made cd work
+- Made pipes for 2 commands
+- Error detection
+- Cursor movement (import readline)
+- Code cleanup with functions
+- time command to measure ellapsed time
+- pipe error handling
+
+Day 2 - 15/06/26
+- Multiple pipes support
+- Persistant history
+- Redirections
+- Time compatibility for Redirections
+
+Day 3 - 16/06/26
+- Shell now interprets "" as one argument
+- Correct error handling in redirect function
+
+Day 4 - 28/06/26
+- time command doesn't get incorrectly called if the word time exists in command
+- Code cleanup
