@@ -21,3 +21,8 @@ Day 3 - 16/06/26
 Day 4 - 28/06/26
 - time command doesn't get incorrectly called if the word time exists in command
 - Code cleanup
+
+Day 5 - 02/07/26
+- Shell now supports pipes and a redirection in the same command.
+- Implemented && and || command chaining
+- Fixed redirect() crashing on invalid input like >>>
