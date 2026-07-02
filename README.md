@@ -9,6 +9,7 @@ Currently Supported Features:
 - time command for measuring how long a command takes to finish.
 - Pipes
 - Redirections (Both > and >>)
+- Command Chaining
 
 Bugs:
 - I know there is a ton of bugs but there are some I plan on fixing and some I will not. 
