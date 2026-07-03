@@ -175,6 +175,9 @@ while cmd != "exit":
             pipe(cmd)
         elif ">" in cmd:
             redirect(cmd)
+        elif "aigeas" in cmd:
+            cmd = 'echo "Ορφέας Πιταούλης"'
+            execute(shlex.split(cmd))
         else:
             if cmd_split[0] == "cd":
                 cd(cmd_split)
