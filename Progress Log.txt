@@ -26,3 +26,6 @@ Day 5 - 02/07/26
 - Shell now supports pipes and a redirection in the same command.
 - Implemented && and || command chaining
 - Fixed redirect() crashing on invalid input like >>>
+
+Day 6 - 06/07/26
+- Multiple command chains are now supported.

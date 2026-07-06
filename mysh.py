@@ -2,6 +2,7 @@
 import atexit
 import getpass
 import os
+import re
 import readline
 import shlex
 import socket
@@ -79,10 +80,13 @@ def cd(cmd):
     if len(cmd) == 2:
         try:
             os.chdir(os.path.expanduser(cmd[1]))
+            return ("fake error", 0)
         except FileNotFoundError:
             print(f'Error: The directory "{cmd[1]}" does not exist.')
+            return ("fake error", 256)
     else:
         os.chdir(os.path.expanduser("~"))
+        return ("fake error", 0)
 
 
 def execute(cmd):
@@ -130,31 +134,47 @@ def mytime(cmd):
         pipe(" ".join(rest))
     elif ">" in " ".join(rest):
         redirect(" ".join(rest))
+    elif "||" in " ".join(rest) or "&&" in " ".join(rest):
+        double_command(" ".join(rest))
     else:
         execute(rest)
     end = time.perf_counter()
     print(f"Elapsed time = {end - start:.3f}")
+    return ("success", 0)
 
 
-def double_command(cmd, operation):
-    if operation == 0:
-        cmd = cmd.split("||")
-        part1 = cmd[0].strip()
-        part2 = cmd[1].strip()
-        status = execute(shlex.split(part1))
+def double_command(cmd):
+    operations = []
+    cmd_split = shlex.split(cmd)
+    for i in cmd_split:
+        if i == "||":
+            operations.append("||")
+        elif i == "&&":
+            operations.append("&&")
+    cmd_split = re.split(r"\|\||&&", cmd)
+    cmd_split = [item.strip() for item in cmd_split if item.strip()]
+    parts = [part for part in cmd_split]
+    for i in range(len(operations) + 1):
+        if shlex.split(parts[i])[0] == "cd":
+            status = cd(shlex.split(parts[i]))
+        elif shlex.split(parts[i])[0] == "time":
+            status = mytime(shlex.split(parts[i]))
+        else:
+            status = execute(shlex.split(parts[i]))
         if os.WIFEXITED(status[1]):
             exit_code = os.WEXITSTATUS(status[1])
-            if exit_code != 0:
-                execute(shlex.split(part2))
-    elif operation == 1:
-        cmd = cmd.split("&&")
-        part1 = cmd[0].strip()
-        part2 = cmd[1].strip()
-        status = execute(shlex.split(part1))
-        if os.WIFEXITED(status[1]):
-            exit_code = os.WEXITSTATUS(status[1])
-            if exit_code == 0:
-                execute(shlex.split(part2))
+            if i > len(operations) - 1:
+                i = i - 1
+            if operations[i] == "||":
+                if exit_code != 0:
+                    continue
+                else:
+                    break
+            elif operations[i] == "&&":
+                if exit_code == 0:
+                    continue
+                else:
+                    break
 
 
 username = getpass.getuser()
@@ -167,10 +187,8 @@ while cmd != "exit":
         cmd_split = shlex.split(cmd)
         if cmd_split[0] == "time":
             mytime(cmd_split)
-        elif "||" in cmd_split:
-            double_command(cmd, 0)
-        elif "&&" in cmd_split:
-            double_command(cmd, 1)
+        elif "||" in cmd_split or "&&" in cmd_split:
+            double_command(cmd)
         elif "|" in cmd:
             pipe(cmd)
         elif ">" in cmd:
