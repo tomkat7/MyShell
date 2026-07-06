@@ -5,9 +5,10 @@ I don't use the subprocess python library because then I wouldn't learn about pr
 ## Use Instructions
 
 **Installation:**
-1) Download the `mysh.py` file
-2) Make it executable with `chmod +x mysh.py`
-3) Run it with `./mysh.py`
+1) Download the `MyShell.zip`
+2) Extract it
+3) Make `mysh.py` it executable with `chmod +x mysh.py`
+4) Run it with `./mysh.py`
 
 **Things to know:**
 - To exit, type `exit` and hit enter.
