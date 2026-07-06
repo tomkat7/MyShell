@@ -9,7 +9,7 @@ import socket
 import sys
 import time
 
-histfile = os.path.expanduser("~/Projects/Python/Shell/.mysh_history")
+histfile = os.path.expanduser("~/.mysh_history")
 try:
     readline.read_history_file(histfile)
 except FileNotFoundError:
