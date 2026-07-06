@@ -1,4 +1,4 @@
-Day 1 - 14/06/26
+## Day 1 - 14/06/26
 - Calling child processes, replacing with programs (Basic command running functionality)
 - Made cd work
 - Made pipes for 2 commands
@@ -8,25 +8,30 @@ Day 1 - 14/06/26
 - time command to measure ellapsed time
 - pipe error handling
 
-Day 2 - 15/06/26
+## Day 2 - 15/06/26
 - Multiple pipes support
 - Persistant history
 - Redirections
 - Time compatibility for Redirections
 
-Day 3 - 16/06/26
+## Day 3 - 16/06/26
 - Shell now interprets "" as one argument
 - Correct error handling in redirect function
 
-Day 4 - 28/06/26
+## Day 4 - 28/06/26
 - time command doesn't get incorrectly called if the word time exists in command
 - Code cleanup
 
-Day 5 - 02/07/26
+## Day 5 - 02/07/26
 - Shell now supports pipes and a redirection in the same command.
 - Implemented && and || command chaining
 - Fixed redirect() crashing on invalid input like >>>
 
-Day 6 - 06/07/26
+## Day 6 - 06/07/26
 - Multiple command chains are now supported.
 - The history file is saved in the user's home directory instead of an absolute path that might not exist.
+- Implemented input redirections.
+- Chaining supports all operations, like pipes, redirections, input redirections etc.
+- Implemented ctrl+c signal handling
+- Fixed Incorrect calling of pipe() and redirect() functions 
+- Added error handling for os.open() failures
