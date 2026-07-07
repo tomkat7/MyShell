@@ -35,3 +35,6 @@
 - Implemented ctrl+c signal handling
 - Fixed Incorrect calling of pipe() and redirect() functions 
 - Added error handling for os.open() failures
+
+## Day 7 - 07/07/26
+- Implemented background jobs.
