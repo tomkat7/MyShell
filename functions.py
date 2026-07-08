@@ -30,6 +30,8 @@ def pipe(cmd,background=False):
     for i in range(n):
         pid = os.fork()
         if pid == 0:
+            if background:
+                os.setpgid(pid, pid)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             if i > 0:
                 os.dup2(pipes[i - 1][0], 0)
@@ -68,6 +70,7 @@ def pipe(cmd,background=False):
         os.close(w)
     for pid in pids:
         if background:
+            os.setpgid(pid, pid)
             background_pids.append(pid)
             background_cmds.append(cmd) 
         else:
@@ -90,10 +93,13 @@ def cd(cmd):
 def execute(cmd,background=False):
     pid = os.fork()
     if pid == 0:
+        if background:
+                os.setpgid(pid, pid)
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         run(cmd)
     else:
         if background:
+            os.setpgid(pid, pid)
             cmd_normal=" ".join(cmd)
             background_pids.append(pid)
             background_cmds.append(cmd_normal)
@@ -121,6 +127,8 @@ def redirect(cmd,background=False):
             return
         pid = os.fork()
         if pid == 0:
+            if background:
+                os.setpgid(pid, pid)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             os.dup2(file_fd, 1)
             os.close(file_fd)
@@ -134,6 +142,8 @@ def redirect(cmd,background=False):
             return
         pid = os.fork()
         if pid == 0:
+            if background:
+                os.setpgid(pid, pid)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             os.dup2(file_fd, 1)
             os.close(file_fd)
@@ -145,6 +155,7 @@ def redirect(cmd,background=False):
     if file_fd != None:
         os.close(file_fd)
     if background:
+        os.setpgid(pid, pid)
         cmd_normal=" ".join(cmd)
         background_pids.append(pid)
         background_cmds.append(cmd_normal)
@@ -163,6 +174,8 @@ def input_redirection(cmd,background=False):
         return
     pid = os.fork()
     if pid == 0:
+            if background:
+                os.setpgid(pid, pid)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             os.dup2(file_fd, 0)
             os.close(file_fd)
@@ -172,6 +185,7 @@ def input_redirection(cmd,background=False):
     if file_fd != None:
         os.close(file_fd)    
     if background:
+        os.setpgid(pid, pid)
         cmd_normal=" ".join(cmd)
         background_pids.append(pid)
         background_cmds.append(cmd_normal)

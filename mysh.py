@@ -35,6 +35,13 @@ while cmd != "exit":
             background=False
         if cmd_split[0] == "time":
             f.mytime(cmd_split)
+        elif cmd == "jobs":
+            if len(f.background_pids) == 0:
+                print("No background jobs running.")
+            else:
+                print("-------======= Running Jobs ======= -------")
+                for i in range(len(f.background_pids)):
+                    print(f"[{f.background_pids[i]}]: {f.background_cmds[i]}")
         elif "||" in cmd_split or "&&" in cmd_split:
             f.chain(cmd)
         elif "<" in cmd_split:

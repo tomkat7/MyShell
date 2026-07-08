@@ -38,3 +38,7 @@
 
 ## Day 7 - 07/07/26
 - Implemented background jobs.
+
+## Day 8 - 08/07/26
+- Isolated background jobs from the main shell process group, so ctrl+c will not affect them.
+- Added a `jobs` command, which shows all running background jobs.

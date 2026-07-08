@@ -1,6 +1,5 @@
-This is a very simple linux shell built in python. 
+This is a simple linux shell built in python. 
 My goal is to learn how shells work, and the best way to do it is building one from scratch. 
-I don't use the subprocess python library because then I wouldn't learn about proceses, forks etc.
 
 ## Use Instructions
 
@@ -13,7 +12,7 @@ I don't use the subprocess python library because then I wouldn't learn about pr
 **Things to know:**
 - To exit, type `exit` and hit enter.
 - When using pipes and redirections in the same command, the redirection has to be the last operation. 
-- For background jobs, & must be the last thing in the command, and chains, time, and cd are not supported for background jobs. 
+- For background jobs, & must be the last thing in the command, and chains, time, and cd are not supported for background jobs.  
 
 **Currently Supported Features:**
 - Runs commands (ofc)
