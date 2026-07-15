@@ -5,7 +5,7 @@ A Unix shell built from scratch in Python — using raw `fork`, `exec`, and `dup
 ## Installation
 
 ```bash
-git clone https://github.com/tomkat7/MyShell.git
+git clone https://github.com/tomkat7/MyShell.git (or download MyShell.zip from releases)
 cd MyShell
 chmod +x mysh.py
 ./mysh.py
