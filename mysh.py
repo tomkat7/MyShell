@@ -8,6 +8,12 @@ import socket
 import signal
 import functions as f
 
+green = "\033[32m"
+red = "\033[31m"
+blue = "\033[34m"
+purple = "\033[35m"
+default = "\033[0m"
+
 background_finished=[]
 signal.signal(signal.SIGINT, signal.SIG_IGN)
 
@@ -21,7 +27,8 @@ atexit.register(readline.write_history_file, histfile)
 
 username = getpass.getuser()
 hostname = socket.gethostname()
-cmd = input(f"{username}@{hostname}:{os.getcwd()}$")
+print(f"{purple}╭─ {green}{username}{purple}@{green}{hostname}{purple}:{blue}{os.getcwd()}")
+cmd = input(f"{purple}╰─{default}$")
 while cmd != "exit":
     if cmd == "":
         print()
@@ -64,4 +71,5 @@ while cmd != "exit":
         f.background_pids.pop(index)
         f.background_cmds.pop(index)
     background_finished=[]
-    cmd = input(f"{username}@{hostname}:{os.getcwd()}$")
+    print(f"{purple}╭─ {green}{username}{purple}@{green}{hostname}{purple}:{blue}{os.getcwd()}")
+    cmd = input(f"{purple}╰─{default}$")
