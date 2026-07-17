@@ -35,3 +35,16 @@
 - Implemented ctrl+c signal handling
 - Fixed Incorrect calling of pipe() and redirect() functions 
 - Added error handling for os.open() failures
+
+## Day 7 - 07/07/26
+- Implemented background jobs.
+
+## Day 8 - 08/07/26
+- Isolated background jobs from the main shell process group, so ctrl+c will not affect them.
+- Added a `jobs` command, which shows all running background jobs.
+
+## Day 9 - 15/07/26
+- Improved the input UI and README
+
+## Day 10 - 17/07/26
+- MAde a better parser (not added to the main loop yet)
