@@ -6,6 +6,10 @@ import time
 import re
 
 
+background_pids=[]
+background_cmds=[]
+
+
 def run(cmd):
     try:
         os.execvp(cmd[0], cmd)
@@ -17,7 +21,7 @@ def run(cmd):
         os._exit(1)
 
 
-def pipe(cmd):
+def pipe(cmd,background=False):
     parts = [shlex.split(p.strip()) for p in cmd.split("|")]
     n = len(parts)
     pipes = [os.pipe() for x in range(n - 1)]
@@ -26,6 +30,8 @@ def pipe(cmd):
     for i in range(n):
         pid = os.fork()
         if pid == 0:
+            if background:
+                os.setpgid(pid, pid)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             if i > 0:
                 os.dup2(pipes[i - 1][0], 0)
@@ -63,7 +69,12 @@ def pipe(cmd):
         os.close(r)
         os.close(w)
     for pid in pids:
-        return os.waitpid(pid, 0)
+        if background:
+            os.setpgid(pid, pid)
+            background_pids.append(pid)
+            background_cmds.append(cmd) 
+        else:
+            return os.waitpid(pid, 0)
 
 
 def cd(cmd):
@@ -79,16 +90,24 @@ def cd(cmd):
         return ("fake error", 0)
 
 
-def execute(cmd):
+def execute(cmd,background=False):
     pid = os.fork()
     if pid == 0:
+        if background:
+                os.setpgid(pid, pid)
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         run(cmd)
     else:
-        return os.waitpid(pid, 0)
+        if background:
+            os.setpgid(pid, pid)
+            cmd_normal=" ".join(cmd)
+            background_pids.append(pid)
+            background_cmds.append(cmd_normal)
+        else:
+            return os.waitpid(pid, 0)
 
 
-def redirect(cmd):
+def redirect(cmd,background=False):
     if " > " in cmd:
         count = 1
         cmd = cmd.split(" > ")
@@ -108,6 +127,8 @@ def redirect(cmd):
             return
         pid = os.fork()
         if pid == 0:
+            if background:
+                os.setpgid(pid, pid)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             os.dup2(file_fd, 1)
             os.close(file_fd)
@@ -121,6 +142,8 @@ def redirect(cmd):
             return
         pid = os.fork()
         if pid == 0:
+            if background:
+                os.setpgid(pid, pid)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             os.dup2(file_fd, 1)
             os.close(file_fd)
@@ -131,9 +154,15 @@ def redirect(cmd):
         return
     if file_fd != None:
         os.close(file_fd)
-    return os.waitpid(pid, 0)
+    if background:
+        os.setpgid(pid, pid)
+        cmd_normal=" ".join(cmd)
+        background_pids.append(pid)
+        background_cmds.append(cmd_normal)
+    else:
+        return os.waitpid(pid, 0)
 
-def input_redirection(cmd):
+def input_redirection(cmd,background=False):
     cmd = cmd.split(" < ")
     filename = cmd[1].strip()
     command = cmd[0]
@@ -145,6 +174,8 @@ def input_redirection(cmd):
         return
     pid = os.fork()
     if pid == 0:
+            if background:
+                os.setpgid(pid, pid)
             signal.signal(signal.SIGINT, signal.SIG_DFL)
             os.dup2(file_fd, 0)
             os.close(file_fd)
@@ -153,7 +184,13 @@ def input_redirection(cmd):
 
     if file_fd != None:
         os.close(file_fd)    
-    return os.waitpid(pid, 0)
+    if background:
+        os.setpgid(pid, pid)
+        cmd_normal=" ".join(cmd)
+        background_pids.append(pid)
+        background_cmds.append(cmd_normal)
+    else:
+        return os.waitpid(pid, 0)
     
 def mytime(cmd):
     rest = cmd[1:]
@@ -163,7 +200,9 @@ def mytime(cmd):
     elif ">" in " ".join(rest):
         redirect(" ".join(rest))
     elif "||" in " ".join(rest) or "&&" in " ".join(rest):
-        double_command(" ".join(rest))
+        chain(" ".join(rest))
+    elif " < " in " ".join(rest):
+        input_redirection(" ".join(rest))
     else:
         execute(rest)
     end = time.perf_counter()
@@ -171,7 +210,7 @@ def mytime(cmd):
     return ("success", 0)
 
 
-def double_command(cmd):
+def chain(cmd):
     operations = []
     cmd_split = shlex.split(cmd)
     for i in cmd_split:
