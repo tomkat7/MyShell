@@ -47,4 +47,7 @@
 - Improved the input UI and README
 
 ## Day 10 - 17/07/26
-- MAde a better parser (not added to the main loop yet)
+- Made a better parser (not added to the main loop yet)
+
+## Day 11 - 20/07/26
+- Started making an executor whoch will take the new command format from the new parser and execute it.
