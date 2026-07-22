@@ -7,12 +7,13 @@ import shlex
 import socket
 import signal
 import functions as f
+import parser as p
+import executor as e
 
-green = "\033[32m"
-red = "\033[31m"
-blue = "\033[34m"
-purple = "\033[35m"
-default = "\033[0m"
+purple = "\001\033[35m\002"
+green = "\001\033[32m\002"
+blue = "\001\033[34m\002"
+default = "\001\033[0m\002"
 
 background_finished=[]
 signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -29,6 +30,8 @@ username = getpass.getuser()
 hostname = socket.gethostname()
 print(f"{purple}╭─ {green}{username}{purple}@{green}{hostname}{purple}:{blue}{os.getcwd()}")
 cmd = input(f"{purple}╰─{default}$")
+
+
 while cmd != "exit":
     if cmd == "":
         print()
@@ -40,8 +43,9 @@ while cmd != "exit":
             background=True
         else:
             background=False
+        display_cmd = cmd 
         if cmd_split[0] == "time":
-            f.mytime(cmd_split)
+            f.mytime(cmd,background,display_cmd)
         elif cmd == "jobs":
             if len(f.background_pids) == 0:
                 print("No background jobs running.")
@@ -49,27 +53,33 @@ while cmd != "exit":
                 print("-------======= Running Jobs ======= -------")
                 for i in range(len(f.background_pids)):
                     print(f"[{f.background_pids[i]}]: {f.background_cmds[i]}")
-        elif "||" in cmd_split or "&&" in cmd_split:
-            f.chain(cmd)
-        elif "<" in cmd_split:
-            f.input_redirection(cmd,background)
-        elif "|" in cmd_split:
-            f.pipe(cmd,background)
-        elif ">" in cmd_split:
-            f.redirect(cmd,background)
+        elif cmd_split[0] == "cd":
+            f.cd(cmd_split)
         else:
-            if cmd_split[0] == "cd":
-                f.cd(cmd_split)
+            cmd, operations = p.parser(cmd)
+            if background:
+                pid = os.fork()
+                if pid == 0:
+                    os.setpgid(pid,pid)
+                    e.run_parsed(cmd, operations)
+                    os._exit(0)
+                else:
+                    f.background_pids.append(pid)
+                    f.background_cmds.append(display_cmd)
             else:
-                f.execute(cmd_split,background)
+                e.run_parsed(cmd, operations)
+
+
     for pid in f.background_pids:
         if os.waitpid(pid, os.WNOHANG) != (0, 0):
             background_finished.append(pid)
+
     for pid in background_finished:
         index = f.background_pids.index(pid)
         print(f"[{pid}]+ Done {f.background_cmds[index]}")
         f.background_pids.pop(index)
         f.background_cmds.pop(index)
+
     background_finished=[]
     print(f"{purple}╭─ {green}{username}{purple}@{green}{hostname}{purple}:{blue}{os.getcwd()}")
     cmd = input(f"{purple}╰─{default}$")

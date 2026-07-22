@@ -50,4 +50,10 @@
 - Made a better parser (not added to the main loop yet)
 
 ## Day 11 - 20/07/26
-- Started making an executor whoch will take the new command format from the new parser and execute it.
+- Started making an executor which will take the new command format from the new parser and execute it.
+
+## Day 12 - 22/07/26
+- Completed executor
+- Implemented the new executor in the main `mysh.py` file. 
+- Removed unused code in `functions.py`
+- Added support for redirections inside pipes.

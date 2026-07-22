@@ -1,5 +1,4 @@
 import shlex
-cmd = "grep py < test.txt && echo Done"
 def parser(cmd):
     cmd = shlex.split(cmd)
 
@@ -18,7 +17,6 @@ def parser(cmd):
         else:
             current_segment.append(token)
     cmd_segmented.append(current_segment)
-    print(cmd_segmented)
 
     current_stage=[]
     cmd_staged=[]
@@ -54,7 +52,4 @@ def parser(cmd):
                     piece.append(token)
             segment_result.append([piece, redirects])
         parsed_cmd.append(segment_result)
-    return parsed_cmd
-
-print(parser(cmd))
-
+    return parsed_cmd, operations
