@@ -63,6 +63,18 @@ Runs the command without blocking the shell. Background jobs run in their own pr
 ```
 [12345]+ Done sleep 30
 ```
+### Combined operators
+Pipes, redirects, and chains can now be freely combined in a single command:
+
+```cat < in.txt | grep foo > out.txt && echo done
+```
+### Backgrounding chains
+Adding `&` to the end of a full chain backgrounds the *entire* chain as one job,
+not just the last command:
+
+```
+sleep 2 && echo done1 || echo done2 &
+```
 
 ### Ctrl+C
 Cancels the currently running foreground command without killing the shell itself.
@@ -71,17 +83,21 @@ Cancels the currently running foreground command without killing the shell itsel
 
 These are documented, intentional gaps — not oversights:
 
-- **Quoted operators inside pipes**: `grep "a|b"` may not parse correctly, since pipe segments are split on `|` before full tokenization. A proper fix requires a character-by-character tokenizer.
-- **Redirection must come after pipes**: in a piped command, `>`/`>>` must be the final operation (e.g. `cmd1 | cmd2 > out.txt` works; other orderings are untested/unsupported).
 - **No wildcard/glob expansion**: `ls *.txt` will not expand `*.txt` — the literal string is passed to the command. Deliberately left unimplemented rather than shipping a version that mishandles filenames with spaces.
-- **Background jobs cannot be combined with `&&`/`||`, `time`, or `cd`**: `&` is only supported as the terminator of a single, non-chained command.
+- **Background jobs cannot be combined with `time`, or `cd`**: `&` is only supported as the terminator of a single, non-chained command.
 - **No environment variable support**: no `export`, no `$VAR` expansion.
 - **No `fg`/`bg`**: background jobs can be listed with `jobs` but not brought back to the foreground once started.
+- **`cd` cannot be used inside a pipe or chain** (e.g. `cd dir && ls` is not supported)
+  It must run standalone, since changing directory only makes sense in the shell's
+  own process, not a forked child.
+
 
 ## Project Structure
 
 - `mysh.py` — main loop, prompt, input dispatch
-- `functions.py` — core shell logic (command execution, pipes, redirection, chaining, background jobs)
+- `functions.py` — built-ins (cd, time)
+- `executor.py` — executes the parsed command (chains, pipes, and plain command are all processed here)
+- `parser.py` — parses the raw command string into a nested lists for the executor to execute.  
 
 ## Why no `subprocess`?
 
