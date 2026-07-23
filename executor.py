@@ -12,11 +12,11 @@ def run_stage(cmd, redirects, stdin_fd=None, stdout_fd=None,):
     if stdin_fd != None:
         os.dup2(stdin_fd,0)
         os.close(stdin_fd)
-    
+
     if stdout_fd != None:
         os.dup2(stdout_fd,1)
         os.close(stdout_fd)
-    
+
     for operator, filename in redirects:
         if operator == ">":
             try:
@@ -49,7 +49,6 @@ def run_stage(cmd, redirects, stdin_fd=None, stdout_fd=None,):
         f.run(cmd)
 
 def run_segment(segment):
-    display_cmd = " | ".join(" ".join(stage[0]) for stage in segment)
     pipes = [os.pipe() for _ in range(len(segment)-1)]
     pids = []
     for i, stage in enumerate(segment):
@@ -58,22 +57,20 @@ def run_segment(segment):
             stdin_fd = pipes[i-1][0]
         else:
             stdin_fd = None
-        
+
         if i < len(segment) - 1:
             stdout_fd = pipes[i][1]
         else:
             stdout_fd = None
         pid = os.fork()
         pids.append(pid)
-        if pid == 0: 
+        if pid == 0:
             try:
                 for j, (r, w) in enumerate(pipes):
                     if j != i - 1:
                         os.close(r)
                     if j != i:
                         os.close(w)
-                signal.signal(signal.SIGINT, signal.SIG_DFL)
-                os.setpgid(0, 0)
                 run_stage(cmd, redirects, stdin_fd, stdout_fd)
             except Exception as ex:
                 print(f"Error: {ex}", file=sys.stderr)
